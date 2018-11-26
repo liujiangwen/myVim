@@ -30,8 +30,22 @@ endfunction
 inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
 inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
 inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"为了使得vim的剪切板能够与外界的剪切板相互沟通，需要安装vim-gnome
+"sudo apt-get install vim-gnome
+"同时为了方便起见，使用了ctrl-c，ctrl-v快捷键
+"虽然ctrl-v本来是用于块状选择的，但是我基本上用不着，所以就覆盖掉它
+"原理 https://blog.csdn.net/sodawaterer/article/details/61918370
+"参考 http://www.cnblogs.com/Ph-one/p/5620894.html
+"CTRL-X is cut
+vnoremap <C-X> "+x
+"CTRL-C is copy
+vnoremap <C-C> "+y
+"CTRL-V is paste
+map <C-V> "+gp
+"set paste "设置粘贴模式状态，此时粘贴的内容可以保持原有的格式不变
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 map <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
 	exec "w"
@@ -60,6 +74,38 @@ func! CompileRunGcc()
 endfunc
 
 
+
+"F7一键编译程序
+nmap <F7> :call DoOneFileMake()<CR>
+function DoOneFileMake()
+if(expand("%:p:h")!=getcwd())
+      echohl WarningMsg | echo "Fail to make! This file is not in the current dir! Press redirect to the dir of this file."
+endif
+ exec "w"
+ call SetCompilation()
+ exec "make"
+ exec "copen"
+endfunction
+function SetCompilation()
+    if &filetype=='c'
+    set makeprg=gcc\ %\ -o\ %<
+    elseif &filetype=='cpp'
+        set makeprg=g++ \ %\ -o\ %< 
+    endif
+endfunction
+
+"第1行:表示映射快捷键F7,即按F4则调用这个一键编译的函数.
+"第3-5行:判断这个文件是否在当前文件夹.
+"第7行:相当于执行命令w
+"第8行:调用函数SetCompilation(),用来设置编译器或者说设定编译命令.
+"第9行:执行make命令
+"第10行:打开quickfix窗口,用于显示编译产生的错误.
+"第13-19行:根据不同的文件类型,来配置makeprg,也就是make命令调用的编译器或编译命令.
+"第14行:判断当前的文件类型是否是C 程序.
+"第15行:设定make命令所调用的编译命令.
+"说明:这样来设定的好处就是编译产生的错误可以直接在\quickfix窗口中显示出来.
+"第16-17行,分析同14-15行.
+
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 "vundle下载方法     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 "vundle插件相关配置
@@ -72,35 +118,6 @@ call vundle#begin()
 "call vundle#begin('~/some/path/here')
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" plugin on GitHub repo
-""Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-" Plugin 'L9'
-" Git plugin not hosted on GitHub
-""Plugin 'git://git.wincent.com/command-t.git'
-" git repos on your local machine (i.e. when working on your own plugin)
-""Plugin 'file:///home/gmarik/path/to/plugin'
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-""Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Install L9 and avoid a Naming conflict if you've already installed a
-" different version somewhere else.
-" Plugin 'ascenator/L9', {'name': 'newL9'}
-" All of your Plugins must be added before the following line
 call vundle#end() " required
 filetype plugin indent on " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList - lists configured plugins
-" :PluginInstall - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
