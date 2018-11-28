@@ -30,6 +30,16 @@ endfunction
 inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
 inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
 inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
+
+"使用TAB跳出括号
+func SkipPair()
+	if getline('.')[col('.')- 1] == ')' ||  getline('.')[col('.')- 1] == ']' ||  getline('.')[col('.')- 1] == '"' ||  getline('.')[col('.')- 1] == "'" ||  getline('.')[col('.')- 1] == '}' 
+		return "\<ESC>la"
+	else
+		return "\t"
+	endif
+endfunc
+inoremap <TAB> <c-r>=SkipPair()<CR>
 "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 "为了使得vim的剪切板能够与外界的剪切板相互沟通，需要安装vim-gnome
 "sudo apt-get install vim-gnome
@@ -72,27 +82,33 @@ func! CompileRunGcc()
         exec "!firefox %.html &"
 	endif
 endfunc
-
+"vim中表示当前目录和当前文件名的方法
+"% 当前完整的文件名
+"%:h 文件名的头部，即文件目录.例如../path/test.c就会为../path
+"%:t 文件名的尾部.例如../path/test.c就会为test.c
+"%:r 无扩展名的文件名.例如../path/test就会成为test
+"%:e 扩展名
 
 
 "F7一键编译程序
-nmap <F7> :call DoOneFileMake()<CR>
-function DoOneFileMake()
-if(expand("%:p:h")!=getcwd())
-      echohl WarningMsg | echo "Fail to make! This file is not in the current dir! Press redirect to the dir of this file."
-endif
- exec "w"
- call SetCompilation()
- exec "make"
- exec "copen"
-endfunction
-function SetCompilation()
-    if &filetype=='c'
-    set makeprg=gcc\ %\ -o\ %<
-    elseif &filetype=='cpp'
-        set makeprg=g++ \ %\ -o\ %< 
-    endif
-endfunction
+"通过makefile以及make命令
+"nmap <F7> :call DoOneFileMake()<CR>
+"function DoOneFileMake()
+"if(expand("%:p:h")!=getcwd())
+"echohl WarningMsg | echo "Fail to make! This file is not in the current dir! Press redirect to the dir of this file."
+"endif
+"exec "w"
+"call SetCompilation()
+"exec "make"
+"exec "copen"
+"endfunction
+"function SetCompilation()
+"if &filetype=='c'
+"set makeprg=gcc\ %\ -o\ %<
+"elseif &filetype=='cpp'
+"set makeprg=g++ \ %\ -o\ %< 
+"endif
+"endfunction
 
 "第1行:表示映射快捷键F7,即按F4则调用这个一键编译的函数.
 "第3-5行:判断这个文件是否在当前文件夹.
