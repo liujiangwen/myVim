@@ -1,4 +1,4 @@
-colorscheme jhdark_modified
+"colorscheme jhdark_modified
 set number	"显示行号
 set tabstop=4	"设置tab制表符为四个空格
 set shiftwidth=4	"设置缩进的空格数为4
@@ -8,9 +8,10 @@ set cindent		"使用c/c++语言的自动缩进方式
 "括号自动补全
 inoremap ( ()<LEFT>
 inoremap [ []<LEFT>
-inoremap { {<CR>}<ESC>kA<CR>
-inoremap " ""<LEFT>
- 
+inoremap { {}<LEFT>
+imap {<CR> {<CR>}<ESC>O
+"inoremap { {}<ESC>lx<ESC>a
+inoremap ' ''<ESC>i
 "如果在自动补全后，又输入了一次右括号，我们需要的是忽略这个多余的右括号，将光标移动到右括号后面即可
 "输入一个字符时，如果下一个字符也是括号，则删除它，避免出现重复字符
 "代码如下
@@ -20,7 +21,7 @@ function! RemoveNextDoubleChar(char)
 	if a:char == l:next_char
 		execute "normal! l"
 	else
-		execute "normal! i" . a:char . ""
+		execute "normal! a" . a:char . ""
 	end
 endfunction
 "使用上面定义的函数
@@ -58,13 +59,13 @@ func! CompileRunGcc()
 	exec "w"
 	if &filetype == 'c'
 		exec "!g++ % -o %<"
-		exec "!time ./%<"
+		exec "!./%<"
 	elseif &filetype == 'cpp'
 		exec "!g++ % -o %<"
-		exec "!time ./%<"
+		exec "!./%<"
 	elseif &filetype == 'java'
 		exec "!javac %"
-		exec "!time java %<"
+		exec "!java %<"
 	endif
 endfunc
 "vim中表示当前目录和当前文件名的方法
@@ -111,4 +112,4 @@ let g:NERDTreewinSize=30
 "显示隐藏文件
 let g:NERDTreeShowHidden=1
 
-set list lcs=tab:\┆\ 
+"set list lcs=tab:\┆\ 
